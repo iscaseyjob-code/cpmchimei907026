@@ -80,172 +80,13 @@
                 lock: <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>,
                 unlock: <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" /></svg>,
                 edit2: <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>,
-                trash2: <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                trash2: <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>,
+                shield: <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M12 3l7 3v5c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6l7-3z" /></svg>
             };
             return svgMap[name] || <span className="w-4 h-4 bg-gray-300 rounded-full inline-block"></span>;
         };
 
-        const INITIAL_POSTS = [
-          {
-            id: 1,
-            title: "AI 協作在實際工作流的二次革命：我們如何節省 40% 的排版時間",
-            category: "professional",
-            categoryLabel: "專業分享",
-            month: "2026-06",
-            author: "技術研發部 · Lead Engineer Leo",
-            date: "2026.06.28",
-            readTime: "6 min",
-            coverUrl: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1200&auto=format&fit=crop",
-            summary: "本月我們在單位內部推行了基於大語言模型的自動化排版與合約校對工作流，從最初的反對到現在全員擁抱，這其中經歷了三個陣痛期與關鍵突破...",
-            views: 128,
-            content: `
-              ### 為什麼我們需要變革？
-              過去每到月底，團隊總要花費大量時間在格式校對、合約條款的比對上。這類重複性工作不僅消磨熱情，也容易因疲憊產生疏漏。因此，我們在六月初正式啟動了「AI 工作流革命」專案。
-              
-              ### 三個關鍵的陣痛期
-              1. **工具信任危機：** 一開始同仁擔心 AI 的輸出會有「幻覺」，我們透過雙重校對機制（Human-in-the-loop）建立起第一道安全網。
-              2. **Prompt 設計的門檻：** 傳統冗長的指令讓大家卻步。我們開發了一套內部指令範本生成器，將指令輸入簡化至 3 個關鍵字。
-              3. **流程整合的阻力：** 舊有系統的串接難免有相容問題，但透過微服務架構，我們順利將 API 嵌入現現有有的簽核系統。
-
-              ### 成果與未來的下一步
-              目前全單位在合約與日常文件產的時間平均減少了 41.5%，並有 92% 的夥伴表示這項變革「顯著減輕了月底的焦慮感」。下個月，我們計劃將這套工作流拓展至設計與簡報生成的協作中。
-            `,
-            likes: 24,
-            tags: ["人工智慧", "工作流優化", "自動化"]
-          },
-          {
-            id: 2,
-            title: "角落的咖啡香：單位專屬「手沖角落」正式開張！",
-            category: "daily",
-            categoryLabel: "日常生活",
-            month: "2026-06",
-            author: "行政社群 · Coffee Master Amanda",
-            date: "2026.06.20",
-            readTime: "3 min",
-            coverUrl: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=1200&auto=format&fit=crop",
-            summary: "在忙碌的專案夾擊下，我們用一塊廢棄 of 舊松木桌、幾隻精心挑選的手沖壺，在辦公室角落撐起了一座屬於大家的靈魂避難所...",
-            views: 246,
-            content: `
-              ### 辦公室裡的第三空間
-              「我們需要的不是更多的咖啡因，而是一段能名正言順發呆五分鐘的時光。」這是當初大家敲碗手沖角落的初衷。
-
-              在單位主管的支持與幾位「咖啡狂熱者」的私房捐獻下，我們在茶水間旁建構了這個溫暖的角落。這裡沒有複雜的 KPI，只有磨豆時散發出的茉莉花香與柑橘香。
-              
-              ### 本月主打豆：耶加雪菲 · 沃卡合作社
-              這個月由 Amanda 為大家帶來的是日曬耶加雪菲。中淺焙的果香非常適合台北悶熱的六月午後，只要下午三點磨豆機聲音一響，大家就會不約而同地帶著馬克杯出現。
-              
-              歡迎大家在工作卡關時，來這裡自己動手沖一杯，或者聽聽 Amanda 聊聊咖啡豆背後的故事。
-            `,
-            likes: 38,
-            tags: ["咖啡角落", "辦公室生活", "微小幸福"]
-          },
-          {
-            id: 3,
-            title: "跨越藩籬的設計美學：打造無障礙數位產品的五個黃金準則",
-            category: "professional",
-            categoryLabel: "專業分享",
-            month: "2026-06",
-            author: "設計中心 · UI/UX Designer Sarah",
-            date: "2026.06.15",
-            readTime: "8 min",
-            coverUrl: "https://images.unsplash.com/photo-1581291518655-9523c932dedf?q=80&w=1200&auto=format&fit=crop",
-            summary: "無障礙設計不只是為了特定人群，而是為了在所有可能情境下（如陽光直射、單手操作）依然能提供完美的體驗。本文拆解最實用的實踐路徑...",
-            views: 184,
-            content: `
-              ### 什麼是包容性設計？
-              我們往往容易陷入「一般使用者」的盲區。事實上，在短暫受傷（如單手骨折）、甚至在公車上單手扶把手、強光下觀看螢幕時，每個人都會成為「暫時性障礙者」。
-              
-              ### 我們團隊落實的五個核心準則：
-              1. **高對比度色彩：** 確保重要文字與背景色對比度至少達 4.5:1。
-              2. **全鍵盤與無障礙導覽：** 即使不用滑鼠，依然能透過 Tab 鍵順暢操作。
-              3. **標籤與說明的清晰度：** 報錯訊息不再顯示「輸入錯誤」，而是精確告知格式問題。
-              4. **足夠大的點擊熱區：** 行動裝置上的按鈕邊界至少需為 48x48 dp。
-              5. **語意化 HTML 結構：** 讓螢幕閱讀器能真正「讀懂」網頁的資訊層級。
-
-              經過這次全面優化，單位的核心網頁無障礙分數（Lighthouse Accessibility）正式達成了 100 分滿分，這也是我們對社會責任與產品品質的最佳承諾。
-            `,
-            likes: 19,
-            tags: ["無障礙設計", "UI/UX", "使用者體驗"]
-          },
-          {
-            id: 4,
-            title: "六月壽星大聯歡！以及那一場驚心動魄的「秘密驚喜計畫」",
-            category: "daily",
-            categoryLabel: "日常生活",
-            month: "2026-06",
-            author: "康樂小組 · HR Specialist Ivy",
-            date: "2026.06.10",
-            readTime: "4 min",
-            coverUrl: "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?q=80&w=1200&auto=format&fit=crop",
-            summary: "為了不讓壽星發現，我們創立了名為「今晚不加班」的祕密群組。結果當天因為專案突發狀況差點穿幫，幸好最後...",
-            views: 312,
-            content: `
-              ### 一個名為「不加班」的祕密行動
-              六月份單位的壽星高達四位！為了給他們一個難忘的生日，康樂小組提前兩週秘密部署。
-
-              我們甚至串通了主管，在行事曆上塞了一個「假緊急會議」，引誘所有人到大會議室集合。
-              
-              ### 驚險的插曲
-              就在當天下午 2:50 分，某大客戶突然撥來視訊電話，兩位壽星正準備衝回座位接聽。眼看計畫要破功，PM 毅然決然「肉身擋門」，用討論客戶規格的藉口在走廊強行拖延了 5 分鐘，終於成功爭取到拉炮與蛋糕就位的時間！
-              
-              當門推開、生日快樂歌響起的那一刻，壽星們臉上的驚愕與笑容，就是所有幕後籌劃人員最大的收穫。再次祝我們優秀的夥伴們生日快樂！
-            `,
-            likes: 45,
-            tags: ["團隊凝聚", "生日派對", "職場日常"]
-          },
-          {
-            id: 5,
-            title: "在混亂中尋找秩序：資訊架構大重整的幕後紀實",
-            category: "professional",
-            categoryLabel: "專業分享",
-            month: "2026-05",
-            author: "產品營運 · PM Kelvin",
-            date: "2026.05.25",
-            readTime: "7 min",
-            coverUrl: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=1200&auto=format&fit=crop",
-            summary: "隨著專案數量在過去一年中翻倍，我們的共用雲端硬碟逐漸變成了無底黑洞。我們是如何花了兩週時間，建立起全新目錄規範...",
-            views: 157,
-            content: `
-              ### 資訊的「熵增」現象
-              「那個檔案在哪裡？」是我們每天最常聽到的問句。為了解決這個問題，我們引進了卡片分類法（Card Sorting）重新界定單位的資訊架構。
-              
-              ### 我們做了哪些事？
-              - **推行「冷熱儲存」分流：** 結案超過一年的專案全部移入封存區，只留下當期進行中的熱檔案。
-              - **首創標準命名語法：** [年份][專案代碼]_[階段]_[版本]_[撰寫人]，杜絕「final_final_真的最後版.pdf」的慘劇。
-              - **知識庫（Knowledge Base）建立：** 將零散的 know-how 提取出來，匯整至統一文件夾。
-
-              現在新進同仁的 onboarding 時間因此縮短了整整 3 天，尋找資料的速度提升了 60%。這是一場安靜但影響深遠的維新。
-            `,
-            likes: 31,
-            tags: ["知識管理", "資訊架構", "敏捷開發"]
-          },
-          {
-            id: 6,
-            title: "初夏野餐日！在大自然裡重新找回團隊的呼吸節奏",
-            category: "daily",
-            categoryLabel: "日常生活",
-            month: "2026-05",
-            author: "福委會 · Picnic Organizer Eric",
-            date: "2026.05.14",
-            readTime: "4 min",
-            coverUrl: "https://images.unsplash.com/photo-1526218626217-dc65a29bb444?q=80&w=1200&auto=format&fit=crop",
-            summary: "週五下午，我們把電腦合上，帶上地墊、木製餐籃與自製的三明治，來到大草皮。沒有簡報與進度追蹤，只有微風...",
-            views: 271,
-            content: `
-              ### 走出水泥叢林
-              「去野餐吧！」福委會一聲令下，大家在週五下午兩點準時登出工作。
-
-              這天的陽光剛好不刺眼，微風吹拂。我們選在了市郊的大草皮，大家鋪開彩繪格紋地墊，擺滿了各自帶來的特色甜點與鹹食。
-              
-              ### 驚喜的草地活動
-              本來以為大家會害羞，沒想到飛盤與極限狼人殺一拿出來，工程師與業務團隊立刻打成一片。我們甚至發現了許多深藏不露的彈唱高手，一把吉他就讓草皮變成了露天音樂會。
-
-              生活與工作的界線在自然中消融，充飽了電，下週一我們又能滿血回歸。
-            `,
-            likes: 52,
-            tags: ["戶外活動", "初夏野餐", "團隊充電"]
-          }
-        ];
+        const INITIAL_POSTS = [];
 
         const ALL_VALID_MONTHS = [
           { value: "2026-06", label: "115 年 6 月" },
@@ -308,6 +149,28 @@
           }
         };
 
+        const clearPersistedData = async () => {
+          try {
+            localStorage.removeItem(STORAGE_KEYS.posts);
+            localStorage.removeItem(STORAGE_KEYS.isAdmin);
+          } catch (error) {
+            console.warn('Local storage cleanup failed:', error);
+          }
+
+          try {
+            const db = await openPersistedDatabase();
+            await new Promise((resolve, reject) => {
+              const transaction = db.transaction('appData', 'readwrite');
+              transaction.objectStore('appData').delete('posts');
+              transaction.objectStore('appData').delete('isAdmin');
+              transaction.oncomplete = () => resolve();
+              transaction.onerror = () => reject(transaction.error);
+            });
+          } catch (error) {
+            console.warn('Persisted storage cleanup failed:', error);
+          }
+        };
+
         const loadPersistedData = async () => {
           try {
             const db = await openPersistedDatabase();
@@ -342,11 +205,30 @@
           }
         };
 
+        const getCategoryMeta = (category) => {
+          const normalized = category || 'medical_quality';
+          switch (normalized) {
+            case 'patient_safety':
+              return { value: 'patient_safety', label: '病人安全', icon: 'shield', badgeClass: 'bg-rose-600 text-white', tabIconClass: 'text-rose-500', chipClass: 'bg-rose-500/10 text-rose-700' };
+            case 'team_daily':
+              return { value: 'team_daily', label: '團隊日常', icon: 'coffee', badgeClass: 'bg-amber-500 text-white', tabIconClass: 'text-amber-500', chipClass: 'bg-amber-500/10 text-amber-700' };
+            case 'life_piece':
+              return { value: 'life_piece', label: '生活小品', icon: 'sparkles', badgeClass: 'bg-violet-600 text-white', tabIconClass: 'text-violet-500', chipClass: 'bg-violet-500/10 text-violet-700' };
+            case 'professional':
+            case 'medical_quality':
+              return { value: 'medical_quality', label: '醫療品質', icon: 'trendingUp', badgeClass: 'bg-emerald-600 text-white', tabIconClass: 'text-emerald-500', chipClass: 'bg-emerald-500/10 text-emerald-700' };
+            case 'daily':
+              return { value: 'team_daily', label: '團隊日常', icon: 'coffee', badgeClass: 'bg-amber-500 text-white', tabIconClass: 'text-amber-500', chipClass: 'bg-amber-500/10 text-amber-700' };
+            default:
+              return { value: 'medical_quality', label: '醫療品質', icon: 'trendingUp', badgeClass: 'bg-emerald-600 text-white', tabIconClass: 'text-emerald-500', chipClass: 'bg-emerald-500/10 text-emerald-700' };
+          }
+        };
+
         function App() {
           const [posts, setPosts] = React.useState(() => {
             try {
               const saved = localStorage.getItem(STORAGE_KEYS.posts);
-              return saved ? JSON.parse(saved) : INITIAL_POSTS;
+              return saved ? [] : INITIAL_POSTS;
             } catch (e) {
               return INITIAL_POSTS;
             }
@@ -399,13 +281,9 @@
           React.useEffect(() => {
             const hydrateStorage = async () => {
               try {
-                const persisted = await loadPersistedData();
-                if (persisted.posts && Array.isArray(persisted.posts)) {
-                  setPosts(persisted.posts);
-                }
-                if (typeof persisted.admin === 'boolean') {
-                  setIsAdmin(persisted.admin);
-                }
+                await clearPersistedData();
+                setPosts([]);
+                setIsAdmin(false);
 
                 if (navigator.storage?.persist) {
                   await navigator.storage.persist();
@@ -439,7 +317,7 @@
 
           // Form States
           const [newTitle, setNewTitle] = React.useState("");
-          const [newCategory, setNewCategory] = React.useState("professional");
+          const [newCategory, setNewCategory] = React.useState("medical_quality");
           const [newAuthor, setNewAuthor] = React.useState("");
           const [newSummary, setNewSummary] = React.useState("");
           const [newContent, setNewContent] = React.useState("");
@@ -467,7 +345,7 @@
           const filteredPosts = React.useMemo(() => {
             return posts.filter(post => {
               const matchMonth = post.month === selectedMonth;
-              const matchCategory = activeCategory === "all" || post.category === activeCategory;
+              const matchCategory = activeCategory === "all" || getCategoryMeta(post.category).value === activeCategory;
               const matchSearch = searchQuery.trim() === "" || 
                 post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 post.author.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -500,7 +378,7 @@
           const openCreateModal = () => {
             setEditingPostId(null);
             setNewTitle("");
-            setNewCategory("professional");
+            setNewCategory("medical_quality");
             setNewAuthor("");
             setNewSummary("");
             setNewContent("");
@@ -515,7 +393,7 @@
             if (e) e.stopPropagation();
             setEditingPostId(post.id);
             setNewTitle(post.title);
-            setNewCategory(post.category);
+            setNewCategory(getCategoryMeta(post.category).value);
             setNewAuthor(post.author);
             setNewSummary(post.summary);
             setNewContent(post.content);
@@ -547,7 +425,7 @@
                     ...post,
                     title: newTitle,
                     category: newCategory,
-                    categoryLabel: newCategory === "professional" ? "專業分享" : "日常生活",
+                    categoryLabel: getCategoryMeta(newCategory).label,
                     month: newMonth,
                     author: newAuthor,
                     coverUrl: newCover,
@@ -564,7 +442,7 @@
                 id: Date.now(),
                 title: newTitle,
                 category: newCategory,
-                categoryLabel: newCategory === "professional" ? "專業分享" : "日常生活",
+                categoryLabel: getCategoryMeta(newCategory).label,
                 month: newMonth,
                 author: newAuthor,
                 date: new Date().toLocaleDateString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '.'),
@@ -928,22 +806,40 @@
                         <span>全部內容</span>
                       </button>
                       <button
-                        onClick={() => { setActiveCategory("professional"); setSelectedPost(null); }}
+                        onClick={() => { setActiveCategory("medical_quality"); setSelectedPost(null); }}
                         className={`px-5 py-2 rounded-lg text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
-                          activeCategory === "professional" ? themeClasses.tabActive : themeClasses.tabInactive
+                          activeCategory === "medical_quality" ? themeClasses.tabActive : themeClasses.tabInactive
                         }`}
                       >
                         <Icon name="trendingUp" className="w-4 h-4 text-emerald-500" />
-                        <span>專業分享</span>
+                        <span>醫療品質</span>
                       </button>
                       <button
-                        onClick={() => { setActiveCategory("daily"); setSelectedPost(null); }}
+                        onClick={() => { setActiveCategory("patient_safety"); setSelectedPost(null); }}
                         className={`px-5 py-2 rounded-lg text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
-                          activeCategory === "daily" ? themeClasses.tabActive : themeClasses.tabInactive
+                          activeCategory === "patient_safety" ? themeClasses.tabActive : themeClasses.tabInactive
                         }`}
                       >
-                        <Icon name="coffee" className="w-4 h-4 text-rose-400" />
-                        <span>日常生活</span>
+                        <Icon name="shield" className="w-4 h-4 text-rose-500" />
+                        <span>病人安全</span>
+                      </button>
+                      <button
+                        onClick={() => { setActiveCategory("team_daily"); setSelectedPost(null); }}
+                        className={`px-5 py-2 rounded-lg text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
+                          activeCategory === "team_daily" ? themeClasses.tabActive : themeClasses.tabInactive
+                        }`}
+                      >
+                        <Icon name="coffee" className="w-4 h-4 text-amber-500" />
+                        <span>團隊日常</span>
+                      </button>
+                      <button
+                        onClick={() => { setActiveCategory("life_piece"); setSelectedPost(null); }}
+                        className={`px-5 py-2 rounded-lg text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
+                          activeCategory === "life_piece" ? themeClasses.tabActive : themeClasses.tabInactive
+                        }`}
+                      >
+                        <Icon name="sparkles" className="w-4 h-4 text-violet-500" />
+                        <span>生活小品</span>
                       </button>
                     </div>
 
@@ -1006,11 +902,7 @@
                               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                               
                               <div className="absolute top-4 left-4 flex gap-1.5 flex-wrap">
-                                <span className={`px-3 py-1 rounded-full text-xs font-bold tracking-wider uppercase shadow-sm ${
-                                  post.category === "professional" 
-                                    ? 'bg-emerald-600 text-white' 
-                                    : 'bg-amber-500 text-white'
-                                }`}>
+                                <span className={`px-3 py-1 rounded-full text-xs font-bold tracking-wider uppercase shadow-sm ${getCategoryMeta(post.category).badgeClass}`}>
                                   {post.categoryLabel}
                                 </span>
                               </div>
@@ -1124,9 +1016,9 @@
                         <img src={selectedPost.coverUrl} alt={selectedPost.title} className="w-full h-full object-cover" />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent" />
                         <div className="absolute bottom-6 left-6 right-6 text-white">
-                          <span className={`px-3 py-1 rounded-full text-xs font-bold tracking-wider uppercase mb-3 inline-block ${
-                            selectedPost.category === "professional" ? 'bg-emerald-600 text-white' : 'bg-amber-500 text-white'
-                          }`}>{selectedPost.categoryLabel}</span>
+                          <span className={`px-3 py-1 rounded-full text-xs font-bold tracking-wider uppercase mb-3 inline-block ${getCategoryMeta(selectedPost.category).badgeClass}`}>
+                          {getCategoryMeta(selectedPost.category).label}
+                        </span>
                           <h2 className="text-2xl md:text-4xl font-serif font-black mb-3 leading-tight">{selectedPost.title}</h2>
                           <div className="flex flex-wrap items-center gap-4 text-xs opacity-95">
                             <span className="flex items-center gap-1 bg-white/10 px-2.5 py-1 rounded-md"><Icon name="user" className="w-3.5 h-3.5" /> {selectedPost.author}</span>
@@ -1278,21 +1170,39 @@
                         <div className="flex flex-col space-y-1.5 pt-2 text-xs">
                           <button 
                             onClick={() => {
-                              setActiveCategory("professional");
+                              setActiveCategory("medical_quality");
                               setSelectedPost(null);
                             }}
                             className="text-left py-1 hover:text-amber-600 font-medium flex items-center gap-1"
                           >
-                            <Icon name="trendingUp" className="w-3.5 h-3.5 text-emerald-500" /> 專業分享專欄
+                            <Icon name="trendingUp" className="w-3.5 h-3.5 text-emerald-500" /> 醫療品質專欄
                           </button>
                           <button 
                             onClick={() => {
-                              setActiveCategory("daily");
+                              setActiveCategory("patient_safety");
                               setSelectedPost(null);
                             }}
                             className="text-left py-1 hover:text-amber-600 font-medium flex items-center gap-1"
                           >
-                            <Icon name="coffee" className="w-3.5 h-3.5 text-rose-400" /> 日常生活專欄
+                            <Icon name="shield" className="w-3.5 h-3.5 text-rose-500" /> 病人安全專欄
+                          </button>
+                          <button 
+                            onClick={() => {
+                              setActiveCategory("team_daily");
+                              setSelectedPost(null);
+                            }}
+                            className="text-left py-1 hover:text-amber-600 font-medium flex items-center gap-1"
+                          >
+                            <Icon name="coffee" className="w-3.5 h-3.5 text-amber-500" /> 團隊日常專欄
+                          </button>
+                          <button 
+                            onClick={() => {
+                              setActiveCategory("life_piece");
+                              setSelectedPost(null);
+                            }}
+                            className="text-left py-1 hover:text-amber-600 font-medium flex items-center gap-1"
+                          >
+                            <Icon name="sparkles" className="w-3.5 h-3.5 text-violet-500" /> 生活小品專欄
                           </button>
                         </div>
                       </div>
@@ -1325,8 +1235,10 @@
                         <div>
                           <label className="block text-xs font-semibold mb-1 opacity-70">分享分類 *</label>
                           <select value={newCategory} onChange={(e) => setNewCategory(e.target.value)} className={`w-full p-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-amber-500/30 ${themeClasses.inputBg}`}>
-                            <option value="professional">專業分享 (技術、專案、流程)</option>
-                            <option value="daily">日常生活 (茶水間、生日、花絮)</option>
+                            <option value="medical_quality">醫療品質</option>
+                            <option value="patient_safety">病人安全</option>
+                            <option value="team_daily">團隊日常</option>
+                            <option value="life_piece">生活小品</option>
                           </select>
                         </div>
                         <div>
@@ -1421,7 +1333,7 @@
                         <textarea rows={6} required placeholder="請貼上 JSON 陣列..." value={importText} onChange={(e) => setImportText(e.target.value)} className={`w-full p-3 rounded-xl border font-mono text-xs focus:outline-none focus:ring-2 focus:ring-amber-500/30 ${themeClasses.inputBg}`} />
                         <div className="flex justify-end gap-2">
                           <button type="button" onClick={() => {
-                            const template = [{ id: Date.now(), title: "標題", category: "professional", categoryLabel: "專業分享", month: "2026-07", author: "作者", date: "2026.07.01", readTime: "5 min", coverUrl: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe", summary: "摘要", content: "### 標題\n內文", likes: 0, tags: ["標籤"] }];
+                            const template = [{ id: Date.now(), title: "標題", category: "medical_quality", categoryLabel: "醫療品質", month: "2026-07", author: "作者", date: "2026.07.01", readTime: "5 min", coverUrl: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe", summary: "摘要", content: "### 標題\n內文", likes: 0, tags: ["標籤"] }];
                             setImportText(JSON.stringify(template, null, 2));
                           }} className="px-4 py-2 rounded-xl text-xs bg-stone-100 text-stone-700">產生範本</button>
                           <button type="submit" className="px-5 py-2 rounded-xl bg-amber-700 text-white text-xs font-bold flex items-center gap-1.5"><Icon name="upload" className="w-3.5 h-3.5" /> 匯入覆蓋資料</button>
