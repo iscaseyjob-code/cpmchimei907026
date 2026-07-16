@@ -226,13 +226,52 @@
           }
         };
 
+        const normalizeTagList = (value) => {
+          if (Array.isArray(value)) {
+            return value.filter(Boolean).map((tag) => String(tag).trim()).filter(Boolean);
+          }
+          if (typeof value === 'string') {
+            return value.split(',').map((tag) => tag.trim()).filter(Boolean);
+          }
+          return [];
+        };
+
+        const normalizePost = (post, fallbackId = Date.now()) => {
+          const safePost = post || {};
+          const category = typeof safePost.category === 'string' && safePost.category ? safePost.category : 'medical_quality';
+          const categoryMeta = getCategoryMeta(category);
+          return {
+            id: safePost.id ?? fallbackId,
+            title: safePost.title || '未命名故事',
+            category,
+            categoryLabel: safePost.categoryLabel || categoryMeta.label,
+            month: safePost.month || '2026-06',
+            author: safePost.author || '作者未提供',
+            date: safePost.date || new Date().toLocaleDateString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '.'),
+            readTime: safePost.readTime || '5 min',
+            coverUrl: safePost.coverUrl || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1200&auto=format&fit=crop',
+            summary: safePost.summary || '',
+            content: safePost.content || '',
+            likes: Number.isFinite(Number(safePost.likes)) ? Number(safePost.likes) : 0,
+            views: Number.isFinite(Number(safePost.views)) ? Number(safePost.views) : 0,
+            tags: normalizeTagList(safePost.tags)
+          };
+        };
+
+        const normalizePosts = (value) => {
+          if (!Array.isArray(value)) {
+            return INITIAL_POSTS;
+          }
+          return value.map((post, index) => normalizePost(post, Date.now() + index));
+        };
+
         function App() {
           const [posts, setPosts] = React.useState(() => {
             try {
               const saved = localStorage.getItem(STORAGE_KEYS.posts);
               if (!saved) return INITIAL_POSTS;
               const parsed = JSON.parse(saved);
-              return Array.isArray(parsed) ? parsed : INITIAL_POSTS;
+              return normalizePosts(parsed);
             } catch (e) {
               return INITIAL_POSTS;
             }
@@ -301,7 +340,7 @@
               try {
                 const persisted = await loadPersistedData();
                 if (persisted.posts && Array.isArray(persisted.posts)) {
-                  setPosts(persisted.posts);
+                  setPosts(normalizePosts(persisted.posts));
                 }
                 if (typeof persisted.admin === 'boolean') {
                   setIsAdmin(persisted.admin);
@@ -451,7 +490,7 @@
             const contentWithImages = [newContent.trim(), imageMarkup].filter(Boolean).join('\n\n');
 
             if (editingPostId !== null) {
-              setPosts(prev => prev.map(post => {
+              setPosts(prev => normalizePosts(prev.map(post => {
                 if (post.id === editingPostId) {
                   return {
                     ...post,
@@ -467,11 +506,11 @@
                   };
                 }
                 return post;
-              }));
+              })));
               triggerToast("月報故事編輯成功！ ✍️");
             } else {
-              const createdPost = {
-                id: Date.now(),
+              const createdPost = normalizePost({
+                id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
                 title: newTitle,
                 category: newCategory,
                 categoryLabel: getCategoryMeta(newCategory).label,
@@ -485,8 +524,9 @@
                 likes: 0,
                 views: 0,
                 tags: tagArray
-              };
-              setPosts([createdPost, ...posts]);
+              });
+              setPosts(prev => [createdPost, ...normalizePosts(prev)]);
+              setSelectedPost(null);
               setSelectedMonth(newMonth);
               triggerToast("全新月報故事發表成功！ 🚀");
             }
