@@ -97,6 +97,7 @@
             readTime: "6 min",
             coverUrl: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1200&auto=format&fit=crop",
             summary: "本月我們在單位內部推行了基於大語言模型的自動化排版與合約校對工作流，從最初的反對到現在全員擁抱，這其中經歷了三個陣痛期與關鍵突破...",
+            views: 128,
             content: `
               ### 為什麼我們需要變革？
               過去每到月底，團隊總要花費大量時間在格式校對、合約條款的比對上。這類重複性工作不僅消磨熱情，也容易因疲憊產生疏漏。因此，我們在六月初正式啟動了「AI 工作流革命」專案。
@@ -123,6 +124,7 @@
             readTime: "3 min",
             coverUrl: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=1200&auto=format&fit=crop",
             summary: "在忙碌的專案夾擊下，我們用一塊廢棄 of 舊松木桌、幾隻精心挑選的手沖壺，在辦公室角落撐起了一座屬於大家的靈魂避難所...",
+            views: 246,
             content: `
               ### 辦公室裡的第三空間
               「我們需要的不是更多的咖啡因，而是一段能名正言順發呆五分鐘的時光。」這是當初大家敲碗手沖角落的初衷。
@@ -148,6 +150,7 @@
             readTime: "8 min",
             coverUrl: "https://images.unsplash.com/photo-1581291518655-9523c932dedf?q=80&w=1200&auto=format&fit=crop",
             summary: "無障礙設計不只是為了特定人群，而是為了在所有可能情境下（如陽光直射、單手操作）依然能提供完美的體驗。本文拆解最實用的實踐路徑...",
+            views: 184,
             content: `
               ### 什麼是包容性設計？
               我們往往容易陷入「一般使用者」的盲區。事實上，在短暫受傷（如單手骨折）、甚至在公車上單手扶把手、強光下觀看螢幕時，每個人都會成為「暫時性障礙者」。
@@ -175,6 +178,7 @@
             readTime: "4 min",
             coverUrl: "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?q=80&w=1200&auto=format&fit=crop",
             summary: "為了不讓壽星發現，我們創立了名為「今晚不加班」的祕密群組。結果當天因為專案突發狀況差點穿幫，幸好最後...",
+            views: 312,
             content: `
               ### 一個名為「不加班」的祕密行動
               六月份單位的壽星高達四位！為了給他們一個難忘的生日，康樂小組提前兩週秘密部署。
@@ -200,6 +204,7 @@
             readTime: "7 min",
             coverUrl: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=1200&auto=format&fit=crop",
             summary: "隨著專案數量在過去一年中翻倍，我們的共用雲端硬碟逐漸變成了無底黑洞。我們是如何花了兩週時間，建立起全新目錄規範...",
+            views: 157,
             content: `
               ### 資訊的「熵增」現象
               「那個檔案在哪裡？」是我們每天最常聽到的問句。為了解決這個問題，我們引進了卡片分類法（Card Sorting）重新界定單位的資訊架構。
@@ -225,6 +230,7 @@
             readTime: "4 min",
             coverUrl: "https://images.unsplash.com/photo-1526218626217-dc65a29bb444?q=80&w=1200&auto=format&fit=crop",
             summary: "週五下午，我們把電腦合上，帶上地墊、木製餐籃與自製的三明治，來到大草皮。沒有簡報與進度追蹤，只有微風...",
+            views: 271,
             content: `
               ### 走出水泥叢林
               「去野餐吧！」福委會一聲令下，大家在週五下午兩點準時登出工作。
@@ -265,10 +271,81 @@
           { value: "2024-10", label: "113 年 10 月" }
         ];
 
+        const STORAGE_KEYS = {
+          posts: 'quality_cruise_posts_v1',
+          isAdmin: 'quality_cruise_is_admin'
+        };
+
+        const openPersistedDatabase = () => new Promise((resolve, reject) => {
+          if (!window.indexedDB) {
+            reject(new Error('IndexedDB unavailable'));
+            return;
+          }
+
+          const request = window.indexedDB.open('quality_cruise_posts_db', 1);
+          request.onupgradeneeded = (event) => {
+            const db = event.target.result;
+            if (!db.objectStoreNames.contains('appData')) {
+              db.createObjectStore('appData', { keyPath: 'key' });
+            }
+          };
+          request.onsuccess = () => resolve(request.result);
+          request.onerror = () => reject(request.error);
+        });
+
+        const savePersistedData = async (postsData, adminState) => {
+          try {
+            const db = await openPersistedDatabase();
+            await new Promise((resolve, reject) => {
+              const transaction = db.transaction('appData', 'readwrite');
+              transaction.objectStore('appData').put({ key: 'posts', value: postsData });
+              transaction.objectStore('appData').put({ key: 'isAdmin', value: adminState });
+              transaction.oncomplete = () => resolve();
+              transaction.onerror = () => reject(transaction.error);
+            });
+          } catch (error) {
+            console.warn('Persisted storage save failed:', error);
+          }
+        };
+
+        const loadPersistedData = async () => {
+          try {
+            const db = await openPersistedDatabase();
+            return await new Promise((resolve, reject) => {
+              const transaction = db.transaction('appData', 'readonly');
+              const postsRequest = transaction.objectStore('appData').get('posts');
+              const adminRequest = transaction.objectStore('appData').get('isAdmin');
+
+              let postsValue = null;
+              let adminValue = null;
+
+              postsRequest.onsuccess = () => {
+                postsValue = postsRequest.result?.value || null;
+                if (adminRequest.readyState === 'done' || adminRequest.result !== undefined) {
+                  resolve({ posts: postsValue, admin: adminValue });
+                }
+              };
+
+              adminRequest.onsuccess = () => {
+                adminValue = adminRequest.result?.value ?? null;
+                if (postsRequest.readyState === 'done' || postsRequest.result !== undefined) {
+                  resolve({ posts: postsValue, admin: adminValue });
+                }
+              };
+
+              postsRequest.onerror = () => reject(postsRequest.error);
+              adminRequest.onerror = () => reject(adminRequest.error);
+            });
+          } catch (error) {
+            console.warn('Persisted storage load failed:', error);
+            return { posts: null, admin: null };
+          }
+        };
+
         function App() {
           const [posts, setPosts] = React.useState(() => {
             try {
-              const saved = localStorage.getItem('quality_cruise_posts_v1');
+              const saved = localStorage.getItem(STORAGE_KEYS.posts);
               return saved ? JSON.parse(saved) : INITIAL_POSTS;
             } catch (e) {
               return INITIAL_POSTS;
@@ -277,13 +354,14 @@
 
           const [isAdmin, setIsAdmin] = React.useState(() => {
             try {
-              const savedRole = localStorage.getItem('quality_cruise_is_admin');
+              const savedRole = localStorage.getItem(STORAGE_KEYS.isAdmin);
               return savedRole === 'true';
             } catch (e) {
               return false;
             }
           });
 
+          const [storageReady, setStorageReady] = React.useState(false);
           const [selectedMonth, setSelectedMonth] = React.useState("2026-06");
           const [activeCategory, setActiveCategory] = React.useState("all");
           const [searchQuery, setSearchQuery] = React.useState("");
@@ -319,12 +397,45 @@
           };
 
           React.useEffect(() => {
-            localStorage.setItem('quality_cruise_posts_v1', JSON.stringify(posts));
-          }, [posts]);
+            const hydrateStorage = async () => {
+              try {
+                const persisted = await loadPersistedData();
+                if (persisted.posts && Array.isArray(persisted.posts)) {
+                  setPosts(persisted.posts);
+                }
+                if (typeof persisted.admin === 'boolean') {
+                  setIsAdmin(persisted.admin);
+                }
+
+                if (navigator.storage?.persist) {
+                  await navigator.storage.persist();
+                }
+              } catch (error) {
+                console.warn('Storage hydration failed:', error);
+              } finally {
+                setStorageReady(true);
+              }
+            };
+
+            hydrateStorage();
+          }, []);
 
           React.useEffect(() => {
-            localStorage.setItem('quality_cruise_is_admin', isAdmin ? 'true' : 'false');
-          }, [isAdmin]);
+            if (!storageReady) return;
+            localStorage.setItem(STORAGE_KEYS.posts, JSON.stringify(posts));
+            savePersistedData(posts, isAdmin);
+          }, [posts, isAdmin, storageReady]);
+
+          React.useEffect(() => {
+            if (!selectedPost) return;
+            setPosts(prev => prev.map(post => post.id === selectedPost.id ? { ...post, views: (post.views || 0) + 1 } : post));
+            setSelectedPost(prev => prev && prev.id === selectedPost.id ? { ...prev, views: (prev.views || 0) + 1 } : prev);
+          }, [selectedPost?.id]);
+
+          React.useEffect(() => {
+            if (!storageReady) return;
+            localStorage.setItem(STORAGE_KEYS.isAdmin, isAdmin ? 'true' : 'false');
+          }, [isAdmin, storageReady]);
 
           // Form States
           const [newTitle, setNewTitle] = React.useState("");
@@ -334,9 +445,24 @@
           const [newContent, setNewContent] = React.useState("");
           const [newTags, setNewTags] = React.useState("");
           const [newCover, setNewCover] = React.useState("https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1200&auto=format&fit=crop");
+          const [newContentImages, setNewContentImages] = React.useState([]);
           const [newMonth, setNewMonth] = React.useState("2026-06");
           const [adminPasscode, setAdminPasscode] = React.useState("");
           const [importText, setImportText] = React.useState("");
+
+          const fileToDataUrl = (file) => {
+            return new Promise((resolve, reject) => {
+              const reader = new FileReader();
+              reader.onload = () => resolve(reader.result);
+              reader.onerror = () => reject(new Error('圖片讀取失敗'));
+              reader.readAsDataURL(file);
+            });
+          };
+
+          const extractImageUrls = (content = "") => {
+            const matches = content.matchAll(/!\[[^\]]*\]\(([^)]+)\)/g);
+            return Array.from(matches, (match) => match[1].trim()).filter(Boolean);
+          };
 
           const filteredPosts = React.useMemo(() => {
             return posts.filter(post => {
@@ -380,6 +506,7 @@
             setNewContent("");
             setNewTags("");
             setNewCover("https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1200&auto=format&fit=crop");
+            setNewContentImages([]);
             setNewMonth(selectedMonth);
             setShowCreateModal(true);
           };
@@ -394,6 +521,7 @@
             setNewContent(post.content);
             setNewTags(post.tags.join(', '));
             setNewCover(post.coverUrl);
+            setNewContentImages(extractImageUrls(post.content));
             setNewMonth(post.month);
             setShowCreateModal(true);
           };
@@ -406,6 +534,11 @@
             }
 
             const tagArray = newTags ? newTags.split(',').map(t => t.trim()).filter(Boolean) : ["日常記錄"];
+            const imageMarkup = newContentImages
+              .filter((url) => !newContent.includes(url))
+              .map((url, index) => `![內文圖片 ${index + 1}](${url})`)
+              .join('\n\n');
+            const contentWithImages = [newContent.trim(), imageMarkup].filter(Boolean).join('\n\n');
 
             if (editingPostId !== null) {
               setPosts(prev => prev.map(post => {
@@ -419,7 +552,7 @@
                     author: newAuthor,
                     coverUrl: newCover,
                     summary: newSummary,
-                    content: newContent,
+                    content: contentWithImages,
                     tags: tagArray
                   };
                 }
@@ -435,11 +568,12 @@
                 month: newMonth,
                 author: newAuthor,
                 date: new Date().toLocaleDateString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '.'),
-                readTime: `${Math.max(1, Math.ceil(newContent.length / 300))} min`,
+                readTime: `${Math.max(1, Math.ceil(contentWithImages.length / 300))} min`,
                 coverUrl: newCover || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1200&auto=format&fit=crop",
                 summary: newSummary,
-                content: newContent,
+                content: contentWithImages,
                 likes: 0,
+                views: 0,
                 tags: tagArray
               };
               setPosts([createdPost, ...posts]);
@@ -466,6 +600,30 @@
                 setConfirmDialog({ isOpen: false, title: "", message: "", onConfirm: null });
               }
             });
+          };
+
+          const handleCoverUpload = async (e) => {
+            const file = e.target.files?.[0];
+            if (!file) return;
+            try {
+              const dataUrl = await fileToDataUrl(file);
+              setNewCover(dataUrl);
+              triggerToast("封面圖已上傳完成 ✨");
+            } catch (error) {
+              triggerToast("封面圖上傳失敗，請再試一次。", "error");
+            }
+          };
+
+          const handleContentImageUpload = async (e) => {
+            const files = Array.from(e.target.files || []);
+            if (!files.length) return;
+            try {
+              const imageUrls = await Promise.all(files.map((file) => fileToDataUrl(file)));
+              setNewContentImages((prev) => [...prev, ...imageUrls]);
+              triggerToast(`已加入 ${imageUrls.length} 張內文圖片 📸`);
+            } catch (error) {
+              triggerToast("內文圖片上傳失敗，請再試一次。", "error");
+            }
           };
 
           const toggleTheme = () => {
@@ -631,6 +789,8 @@
                     <span>後台管理維護狀態 (可自由新增、修改、下架任何月份內容)</span>
                   </div>
                   <div className="flex items-center space-x-3">
+                    <span className="text-emerald-600 font-semibold">永久儲存已啟用</span>
+                    <span>|</span>
                     <button 
                       onClick={() => setShowManageModal(true)}
                       className="hover:underline flex items-center gap-1 text-amber-600 font-bold"
@@ -898,6 +1058,10 @@
                                 </span>
                                 
                                 <div className="flex items-center space-x-3">
+                                  <span className="flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-stone-500/10 text-stone-600 transition-all duration-300">
+                                    <Icon name="search" className="w-3.5 h-3.5" />
+                                    <span>{post.views || 0}</span>
+                                  </span>
                                   <button
                                     onClick={(e) => handleLike(post.id, e)}
                                     className="flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 transition-all duration-300"
@@ -968,6 +1132,8 @@
                             <span className="flex items-center gap-1 bg-white/10 px-2.5 py-1 rounded-md"><Icon name="user" className="w-3.5 h-3.5" /> {selectedPost.author}</span>
                             <span className="flex items-center gap-1 bg-white/10 px-2.5 py-1 rounded-md"><Icon name="calendar" className="w-3.5 h-3.5" /> {selectedPost.date}</span>
                             <span className="flex items-center gap-1 bg-white/10 px-2.5 py-1 rounded-md"><Icon name="bookOpen" className="w-3.5 h-3.5" /> 預估閱讀 {selectedPost.readTime}</span>
+                            <span className="flex items-center gap-1 bg-white/10 px-2.5 py-1 rounded-md"><Icon name="search" className="w-3.5 h-3.5" /> {selectedPost.views || 0} 次瀏覽</span>
+                            <span className="flex items-center gap-1 bg-white/10 px-2.5 py-1 rounded-md"><Icon name="heart" className="w-3.5 h-3.5" /> {selectedPost.likes} 次喜歡</span>
                           </div>
                         </div>
                       </div>
@@ -998,6 +1164,22 @@
                               <ol key={index} className="list-decimal pl-6 my-4 space-y-2 text-base leading-relaxed opacity-95">
                                 {listItems.map((li, i) => <li key={i}>{li}</li>)}
                               </ol>
+                            );
+                          }
+                          if (trimmed.includes('![') && trimmed.includes('](')) {
+                            const imageMatches = [...trimmed.matchAll(/!\[([^\]]*)\]\(([^)]+)\)/g)];
+                            const textWithoutImages = trimmed.replace(/!\[[^\]]*\]\(([^)]+)\)/g, '').trim();
+                            return (
+                              <div key={index} className="my-6 space-y-4">
+                                {imageMatches.map((match, imageIndex) => (
+                                  <img key={`${match[2]}-${imageIndex}`} src={match[2]} alt={match[1] || '內文圖片'} className="w-full rounded-3xl object-cover shadow-md border border-stone-200/70" />
+                                ))}
+                                {textWithoutImages && (
+                                  <p className="text-lg leading-relaxed opacity-90 indent-0 md:text-justify font-normal">
+                                    {textWithoutImages}
+                                  </p>
+                                )}
+                              </div>
                             );
                           }
                           return (
@@ -1122,19 +1304,19 @@
 
               {/* Add/Edit Modal */}
               {showCreateModal && (
-                <div className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
-                  <div className={`relative max-w-2xl w-full rounded-3xl overflow-hidden shadow-2xl border ${theme === 'warm' ? 'bg-white border-stone-200 text-stone-900' : 'bg-[#161719] border-zinc-800 text-zinc-100'}`}>
+                <div className="fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-sm animate-fade-in">
+                  <div className={`relative min-h-screen w-full overflow-hidden border ${theme === 'warm' ? 'bg-white border-stone-200 text-stone-900' : 'bg-[#161719] border-zinc-800 text-zinc-100'}`}>
                     <div className="p-6 border-b border-stone-200/40 flex items-center justify-between">
                       <div>
                         <h3 className="text-xl font-serif font-bold flex items-center gap-2">
                           <Icon name="sparkles" className="w-5 h-5 text-amber-500" />
-                          {editingPostId !== null ? "編輯月報故事" : "提筆記錄本月動態"}
+                          {editingPostId !== null ? "編輯月報故事" : "發表月報故事"}
                         </h3>
                       </div>
                       <button onClick={() => setShowCreateModal(false)} className="p-1.5 rounded-full hover:bg-stone-100 dark:hover:bg-zinc-800"><Icon name="x" className="w-5 h-5" /></button>
                     </div>
 
-                    <form onSubmit={handleCreateOrEditPost} className="p-6 space-y-4 max-h-[70vh] overflow-y-auto text-sm">
+                    <form onSubmit={handleCreateOrEditPost} className="p-6 md:p-10 space-y-4 max-w-5xl mx-auto text-sm pb-16">
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
                           <label className="block text-xs font-semibold mb-1 opacity-70">發表年份與月份 *</label>
@@ -1153,14 +1335,34 @@
                         </div>
                       </div>
 
-                      <div>
-                        <label className="block text-xs font-semibold mb-1 opacity-70">封面圖片預設情境庫</label>
-                        <select value={newCover} onChange={(e) => setNewCover(e.target.value)} className={`w-full p-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-amber-500/30 ${themeClasses.inputBg}`}>
-                          <option value="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1200&auto=format&fit=crop">現代幾何美學</option>
-                          <option value="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=1200&auto=format&fit=crop">工作會議</option>
-                          <option value="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=1200&auto=format&fit=crop">手磨咖啡</option>
-                          <option value="https://images.unsplash.com/photo-1513151233558-d860c5398176?q=80&w=1200&auto=format&fit=crop">璀璨慶祝</option>
-                        </select>
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <div className={`p-4 rounded-2xl border ${theme === 'warm' ? 'bg-stone-50 border-stone-200' : 'bg-zinc-900/60 border-zinc-800'}`}>
+                          <label className="block text-xs font-semibold mb-2 opacity-70">封面圖上傳</label>
+                          <input type="file" accept="image/*" onChange={handleCoverUpload} className="w-full text-xs file:mr-3 file:py-2 file:px-3 file:rounded-full file:border-0 file:bg-amber-600 file:text-white" />
+                          <div className="mt-3">
+                            <label className="block text-xs font-semibold mb-1 opacity-70">封面圖片預設情境庫</label>
+                            <select value={newCover} onChange={(e) => setNewCover(e.target.value)} className={`w-full p-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-amber-500/30 ${themeClasses.inputBg}`}>
+                              <option value="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1200&auto=format&fit=crop">現代幾何美學</option>
+                              <option value="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=1200&auto=format&fit=crop">工作會議</option>
+                              <option value="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=1200&auto=format&fit=crop">手磨咖啡</option>
+                              <option value="https://images.unsplash.com/photo-1513151233558-d860c5398176?q=80&w=1200&auto=format&fit=crop">璀璨慶祝</option>
+                            </select>
+                          </div>
+                          {newCover && (
+                            <img src={newCover} alt="封面預覽" className="mt-3 h-40 w-full rounded-2xl object-cover border border-stone-200/70" />
+                          )}
+                        </div>
+                        <div className={`p-4 rounded-2xl border ${theme === 'warm' ? 'bg-stone-50 border-stone-200' : 'bg-zinc-900/60 border-zinc-800'}`}>
+                          <label className="block text-xs font-semibold mb-2 opacity-70">內文圖上傳（可多選）</label>
+                          <input type="file" accept="image/*" multiple onChange={handleContentImageUpload} className="w-full text-xs file:mr-3 file:py-2 file:px-3 file:rounded-full file:border-0 file:bg-amber-600 file:text-white" />
+                          {newContentImages.length > 0 && (
+                            <div className="mt-3 grid grid-cols-2 gap-2">
+                              {newContentImages.map((imageUrl, index) => (
+                                <img key={`${imageUrl}-${index}`} src={imageUrl} alt={`內文圖片 ${index + 1}`} className="h-24 w-full rounded-xl object-cover border border-stone-200/70" />
+                              ))}
+                            </div>
+                          )}
+                        </div>
                       </div>
 
                       <div>
@@ -1175,7 +1377,7 @@
 
                       <div>
                         <label className="block text-xs font-semibold mb-1 opacity-70">詳細內文 *</label>
-                        <textarea required rows={6} placeholder={`### 標題\n內文段落...`} value={newContent} onChange={(e) => setNewContent(e.target.value)} className={`w-full p-3 rounded-xl border font-mono text-xs focus:outline-none focus:ring-2 focus:ring-amber-500/30 ${themeClasses.inputBg}`} />
+                        <textarea required rows={10} placeholder={`### 標題\n內文段落...`} value={newContent} onChange={(e) => setNewContent(e.target.value)} className={`w-full p-3 rounded-xl border font-mono text-xs focus:outline-none focus:ring-2 focus:ring-amber-500/30 ${themeClasses.inputBg}`} />
                       </div>
 
                       <div>
