@@ -176,31 +176,21 @@
         const loadPersistedData = async () => {
           try {
             const db = await openPersistedDatabase();
-            return await new Promise((resolve, reject) => {
-              const transaction = db.transaction('appData', 'readonly');
-              const postsRequest = transaction.objectStore('appData').get('posts');
-              const adminRequest = transaction.objectStore('appData').get('isAdmin');
+            const transaction = db.transaction('appData', 'readonly');
+            const store = transaction.objectStore('appData');
 
-              let postsValue = null;
-              let adminValue = null;
-
-              postsRequest.onsuccess = () => {
-                postsValue = postsRequest.result?.value || null;
-                if (adminRequest.readyState === 'done' || adminRequest.result !== undefined) {
-                  resolve({ posts: postsValue, admin: adminValue });
-                }
-              };
-
-              adminRequest.onsuccess = () => {
-                adminValue = adminRequest.result?.value ?? null;
-                if (postsRequest.readyState === 'done' || postsRequest.result !== undefined) {
-                  resolve({ posts: postsValue, admin: adminValue });
-                }
-              };
-
-              postsRequest.onerror = () => reject(postsRequest.error);
-              adminRequest.onerror = () => reject(adminRequest.error);
+            const readValue = (key) => new Promise((resolve) => {
+              const request = store.get(key);
+              request.onsuccess = () => resolve(request.result?.value ?? null);
+              request.onerror = () => resolve(null);
             });
+
+            const [postsValue, adminValue] = await Promise.all([
+              readValue('posts'),
+              readValue('isAdmin')
+            ]);
+
+            return { posts: postsValue, admin: adminValue };
           } catch (error) {
             console.warn('Persisted storage load failed:', error);
             return { posts: null, admin: null };
