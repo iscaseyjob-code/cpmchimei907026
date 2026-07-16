@@ -116,8 +116,11 @@
           posts: 'quality_cruise_posts_v1',
           isAdmin: 'quality_cruise_is_admin',
           selectedMonth: 'quality_cruise_selected_month',
-          activeCategory: 'quality_cruise_active_category'
+          activeCategory: 'quality_cruise_active_category',
+          draft: 'quality_cruise_draft_v1'
         };
+
+        const DEFAULT_COVER_URL = 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1200&auto=format&fit=crop';
 
         const openPersistedDatabase = () => new Promise((resolve, reject) => {
           if (!window.indexedDB) {
@@ -383,11 +386,55 @@
           const [newSummary, setNewSummary] = React.useState("");
           const [newContent, setNewContent] = React.useState("");
           const [newTags, setNewTags] = React.useState("");
-          const [newCover, setNewCover] = React.useState("https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1200&auto=format&fit=crop");
+          const [newCover, setNewCover] = React.useState(DEFAULT_COVER_URL);
           const [newContentImages, setNewContentImages] = React.useState([]);
           const [newMonth, setNewMonth] = React.useState("2026-06");
           const [adminPasscode, setAdminPasscode] = React.useState("");
           const [importText, setImportText] = React.useState("");
+
+          const saveDraftToStorage = React.useCallback(() => {
+            if (!storageReady) return;
+            const draftPayload = {
+              title: newTitle,
+              category: newCategory,
+              author: newAuthor,
+              summary: newSummary,
+              content: newContent,
+              tags: newTags,
+              cover: newCover,
+              contentImages: newContentImages,
+              month: newMonth,
+              updatedAt: Date.now()
+            };
+            const hasContent = draftPayload.title.trim() || draftPayload.author.trim() || draftPayload.summary.trim() || draftPayload.content.trim() || draftPayload.tags.trim() || draftPayload.contentImages.length > 0 || draftPayload.cover !== DEFAULT_COVER_URL;
+            if (hasContent) {
+              localStorage.setItem(STORAGE_KEYS.draft, JSON.stringify(draftPayload));
+            }
+          }, [storageReady, newTitle, newCategory, newAuthor, newSummary, newContent, newTags, newCover, newContentImages, newMonth]);
+
+          const clearDraftFromStorage = () => {
+            try {
+              localStorage.removeItem(STORAGE_KEYS.draft);
+            } catch (error) {
+              console.warn('Draft cleanup failed:', error);
+            }
+          };
+
+          const loadDraftFromStorage = () => {
+            try {
+              const raw = localStorage.getItem(STORAGE_KEYS.draft);
+              if (!raw) return null;
+              const parsed = JSON.parse(raw);
+              return parsed && typeof parsed === 'object' ? parsed : null;
+            } catch (error) {
+              console.warn('Draft load failed:', error);
+              return null;
+            }
+          };
+
+          React.useEffect(() => {
+            saveDraftToStorage();
+          }, [saveDraftToStorage]);
 
           const fileToDataUrl = (file) => {
             return new Promise((resolve, reject) => {
@@ -438,15 +485,16 @@
 
           const openCreateModal = () => {
             setEditingPostId(null);
-            setNewTitle("");
-            setNewCategory("medical_quality");
-            setNewAuthor("");
-            setNewSummary("");
-            setNewContent("");
-            setNewTags("");
-            setNewCover("https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1200&auto=format&fit=crop");
-            setNewContentImages([]);
-            setNewMonth(selectedMonth);
+            const savedDraft = loadDraftFromStorage();
+            setNewTitle(savedDraft?.title || "");
+            setNewCategory(savedDraft?.category || "medical_quality");
+            setNewAuthor(savedDraft?.author || "");
+            setNewSummary(savedDraft?.summary || "");
+            setNewContent(savedDraft?.content || "");
+            setNewTags(savedDraft?.tags || "");
+            setNewCover(savedDraft?.cover || DEFAULT_COVER_URL);
+            setNewContentImages(savedDraft?.contentImages || []);
+            setNewMonth(savedDraft?.month || selectedMonth);
             setShowCreateModal(true);
           };
 
@@ -497,6 +545,7 @@
                 }
                 return post;
               })));
+              clearDraftFromStorage();
               triggerToast("月報故事編輯成功！ ✍️");
             } else {
               const createdPost = normalizePost({
@@ -518,6 +567,7 @@
               setPosts(prev => [createdPost, ...normalizePosts(prev)]);
               setSelectedPost(null);
               setSelectedMonth(newMonth);
+              clearDraftFromStorage();
               triggerToast("全新月報故事發表成功！ 🚀");
             }
 
@@ -1284,6 +1334,7 @@
                           <Icon name="sparkles" className="w-5 h-5 text-amber-500" />
                           {editingPostId !== null ? "編輯月報故事" : "發表月報故事"}
                         </h3>
+                        <p className="text-xs opacity-60 mt-1">草稿會自動保存，關閉後再次打開仍可恢復。</p>
                       </div>
                       <button onClick={() => setShowCreateModal(false)} className="p-1.5 rounded-full hover:bg-stone-100 dark:hover:bg-zinc-800"><Icon name="x" className="w-5 h-5" /></button>
                     </div>
